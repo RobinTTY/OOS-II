@@ -2,11 +2,20 @@ package senser;
 
 public class AircraftSentence
 {
-	//TODO: Create attributes
+    public String aircraftJson;
 
-	//TODO: Create constructor
+    AircraftSentence(String token)
+    {
+        this.aircraftJson = token;
+    }
 
-	//TODO: Create relevant getter methods
-	
-	//TODO: Overwrite toString() method to print sentence
+	public String getAircraftJson()
+    {
+        return aircraftJson;
+    }
+
+    public String toString()
+    {
+        return getAircraftJson();
+    }
 }
