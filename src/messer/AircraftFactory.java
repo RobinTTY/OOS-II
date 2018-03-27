@@ -1,9 +1,7 @@
 package messer;
 
-import java.util.Date;
-import java.util.regex.*;
-
 import senser.AircraftSentence;
+import java.util.Date;
 
 /* Get the following datafields out of the JSON sentence using Regex and String methods
  * and return a BasicAircraft
@@ -35,6 +33,7 @@ public class AircraftFactory {
 		int altitude = 0;
 
 		// TODO: Your code goes here
+        
 		
 		BasicAircraft msg = new BasicAircraft(icao, operator, species, posTime, new Coordinate(latitude, longitude), speed, trak, altitude);
 		
