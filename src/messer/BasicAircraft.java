@@ -1,9 +1,13 @@
 package messer;
 
+import com.fasterxml.jackson.annotation.*;
+
 import java.util.ArrayList;
 import java.util.Date;
 
+@JsonIgnoreProperties({"VsiT"})
 public class BasicAircraft {
+    private String vsit;
 	private String icao;
 	private String operator;
 	private Integer species;
@@ -15,7 +19,8 @@ public class BasicAircraft {
 	
 	//TODO: Create constructor
 
-	public BasicAircraft( String icao, String operator, Integer species, Date posTime, Coordinate coordinate, Double speed, Double trak, Integer altitude)
+    @JsonCreator
+	public BasicAircraft(@JsonProperty("Icao") String icao, @JsonProperty("Op") String operator, @JsonProperty("Species") Integer species, @JsonProperty("PosTime") Date posTime, @JsonProperty("coord") Coordinate coordinate, @JsonProperty("Spd") Double speed, @JsonProperty("Trak") Double trak, @JsonProperty("GAlt") Integer altitude)
 	{
 		this.operator = operator;
 		this.species = species;
@@ -27,7 +32,7 @@ public class BasicAircraft {
 		this.icao = icao;
 	}
 
-	//TODO: Create relevant getter methods
+	//getter methods
 	public String getIcao() {
 		return icao;
 	}
@@ -56,8 +61,7 @@ public class BasicAircraft {
 		return altitude;
 	}
 
-
-	//TODO: Lab 4-6 return attribute names and values for table
+    //TODO: Lab 4-6 return attribute names and values for table
 	public static ArrayList<String> getAttributesNames()
 	{
 		return null;

@@ -1,4 +1,5 @@
 package messer;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,7 +36,12 @@ public class Messer extends Observable implements Observer, Runnable
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			BasicAircraft msg = factory.fromAircraftSentence(sentence);
+			BasicAircraft msg = null;
+			try {
+				msg = factory.fromAircraftSentence(sentence);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
 			// Display the message in Lab 2; disable for other labs
 			if (lab2) display.display(msg);
