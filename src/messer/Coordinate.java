@@ -23,10 +23,10 @@ public class Coordinate {
 	}
 
 	@JsonCreator
-	public Coordinate(@JsonProperty("Lat") double latitude, @JsonProperty("Long") double longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
+	public Coordinate(@JsonProperty("Lat") Double latitude,@JsonProperty("Long") double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
 	@Override
 	public String toString() {

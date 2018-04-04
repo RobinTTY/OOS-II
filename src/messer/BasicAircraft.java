@@ -21,12 +21,12 @@ public class BasicAircraft {
 	//TODO: Create constructor
 
     @JsonCreator
-	public BasicAircraft(@JsonProperty("Icao") String icao, @JsonProperty("Op") String operator, @JsonProperty("Species") Integer species, @JsonProperty("PosTime") Date posTime, @JsonProperty("coord") Coordinate coordinate, @JsonProperty("Spd") Double speed, @JsonProperty("Trak") Double trak, @JsonProperty("GAlt") Integer altitude)
+	public BasicAircraft(@JsonProperty("Icao") String icao, @JsonProperty("Op") String operator, @JsonProperty("Species") Integer species, @JsonProperty("PosTime") Date posTime, @JsonProperty("Lat") Double latit, @JsonProperty("Long") Double longit, @JsonProperty("Spd") Double speed, @JsonProperty("Trak") Double trak, @JsonProperty("GAlt") Integer altitude)
 	{
 		this.operator = operator;
 		this.species = species;
 		this.posTime = posTime;
-		this.coordinate = coordinate;
+		this.coordinate = new Coordinate(latit,longit);
 		this.speed = speed;
 		this.trak = trak;
 		this.altitude = altitude;

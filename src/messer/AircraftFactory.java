@@ -21,8 +21,6 @@ public class AircraftFactory {
         System.out.println(sentence.toString());
 		ObjectMapper mapper = new ObjectMapper();	//jackson mapper
 		BasicAircraft aircraft = mapper.readValue("{" + sentence.toString() + "}", BasicAircraft.class);
-
-		BasicAircraft msg = new BasicAircraft(icao, operator, species, posTime, new Coordinate(latitude, longitude), speed, trak, altitude);
 		return aircraft;
 	}
 }
