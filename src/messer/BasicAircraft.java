@@ -5,8 +5,9 @@ import com.fasterxml.jackson.annotation.*;
 import java.util.ArrayList;
 import java.util.Date;
 
-@JsonIgnoreProperties({"VsiT"})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BasicAircraft {
+	@JsonProperty("VsiT")
     private String vsit;
 	private String icao;
 	private String operator;
