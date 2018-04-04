@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 public class AircraftFactory {
 
-	public BasicAircraft fromAircraftSentence ( AircraftSentence sentence ) {
+	public BasicAircraft fromAircraftSentence (AircraftSentence sentence ) {
 		String icao = null;
 		String operator = null;
 		int species = 0;
