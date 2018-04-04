@@ -1,6 +1,5 @@
 package messer;
 import senser.AircraftSentence;
-
 import java.io.IOException;
 import java.util.Date;
 import com.fasterxml.jackson.databind.*;
