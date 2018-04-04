@@ -1,12 +1,13 @@
 package messer;
 import senser.AircraftSentence;
+
 import java.io.IOException;
 import java.util.Date;
 import com.fasterxml.jackson.databind.*;
 
 public class AircraftFactory {
 
-	public BasicAircraft fromAircraftSentence ( AircraftSentence sentence ) throws IOException {
+	public BasicAircraft fromAircraftSentence (AircraftSentence sentence ) throws IOException {
 		String icao = null;
 		String operator = null;
 		int species = 0;
