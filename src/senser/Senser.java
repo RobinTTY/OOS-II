@@ -7,7 +7,7 @@ import jsonstream.*;
 
 public class Senser extends Observable implements Runnable
 {
-	private static boolean lab1 = true;
+	private static boolean lab1 = false;
 	PlaneDataServer server;
 
 	public Senser(PlaneDataServer server)
@@ -41,7 +41,7 @@ public class Senser extends Observable implements Runnable
 			//get aircraft list from factory and display plane jsons
 			jsonAircraftList = factory.fromAircraftJson(aircraftList);
 
-			if (lab1) System.out.println("Current Aircrafts in range " + jsonAircraftList.size());
+			/* if (lab1) */ System.out.println("Current Aircrafts in range " + jsonAircraftList.size());
 			for(AircraftSentence sentence : jsonAircraftList)
 			{
 				// Display the sentence in Lab 1; disable for other labs

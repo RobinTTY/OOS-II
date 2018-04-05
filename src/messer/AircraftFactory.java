@@ -18,9 +18,7 @@ public class AircraftFactory {
 		int altitude = 0;
 
 
-        System.out.println(sentence.toString());
 		ObjectMapper mapper = new ObjectMapper();	//jackson mapper
-		BasicAircraft aircraft = mapper.readValue("{" + sentence.toString() + "}", BasicAircraft.class);
-		return aircraft;
+		return mapper.readValue("{" + sentence.toString() + "}", BasicAircraft.class);
 	}
 }
