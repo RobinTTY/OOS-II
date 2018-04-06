@@ -9,8 +9,8 @@ import messer.*;
 //TODO: create hash map and complete all operations
 public class ActiveAircrafts implements Observer
 {
-	private HashMap<K, V> activeAircrafts;    	// store the basic aircraft and use its Icao as key 
-												// replace K and V with the correct class names
+	private HashMap<String , ArrayList<BasicAircraft>> activeAircrafts;    	// store the basic aircraft and use its Icao as key
+                                                                            // replace K and V with the correct class names
 
 	public ActiveAircrafts () {
 	}

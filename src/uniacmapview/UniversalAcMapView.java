@@ -30,18 +30,18 @@ import messer.BasicAircraft;
 import messer.*;
 import senser.Senser;
 
-import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.MapComponentInitializedListener;
-import com.lynden.gmapsfx.javascript.event.GMapMouseEvent;
-import com.lynden.gmapsfx.javascript.event.UIEventType;
-import com.lynden.gmapsfx.javascript.object.GoogleMap;
-import com.lynden.gmapsfx.javascript.object.LatLong;
-import com.lynden.gmapsfx.javascript.object.MapOptions;
-import com.lynden.gmapsfx.javascript.object.Marker;
-import com.lynden.gmapsfx.javascript.object.MarkerOptions;
-import com.lynden.gmapsfx.util.MarkerImageFactory;
+//import com.lynden.gmapsfx.GoogleMapView;
+//import com.lynden.gmapsfx.MapComponentInitializedListener;
+//import com.lynden.gmapsfx.javascript.event.GMapMouseEvent;
+//import com.lynden.gmapsfx.javascript.event.UIEventType;
+//import com.lynden.gmapsfx.javascript.object.GoogleMap;
+//import com.lynden.gmapsfx.javascript.object.LatLong;
+//import com.lynden.gmapsfx.javascript.object.MapOptions;
+//import com.lynden.gmapsfx.javascript.object.Marker;
+//import com.lynden.gmapsfx.javascript.object.MarkerOptions;
+//import com.lynden.gmapsfx.util.MarkerImageFactory;
 
-public class UniversalAcMapView extends Application implements Observer, MapComponentInitializedListener
+ public class UniversalAcMapView extends Application implements Observer
 {
 	private ActiveAircrafts activeAircrafts;
     private TableView<BasicAircraft> table = new TableView<BasicAircraft>();

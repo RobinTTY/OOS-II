@@ -36,7 +36,7 @@ import com.lynden.gmapsfx.javascript.object.Marker;
 import com.lynden.gmapsfx.javascript.object.MarkerOptions;
 import com.lynden.gmapsfx.util.MarkerImageFactory;
 
-public class AcMapView extends Application implements Observer, MapComponentInitializedListener
+public class AcMapView extends Application implements Observer
 {
 	private ActiveAircrafts activeAircrafts;
     private TableView<BasicAircraft> table = new TableView<BasicAircraft>();
