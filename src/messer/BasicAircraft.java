@@ -2,6 +2,7 @@ package messer;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -17,8 +18,6 @@ public class BasicAircraft {
 	private Double speed;
 	private Double trak;
 	private Integer altitude;
-	
-	//TODO: Create constructor
 
     @JsonCreator
 	public BasicAircraft(@JsonProperty("Icao") String icao, @JsonProperty("Op") String operator, @JsonProperty("Species") Integer species, @JsonProperty("PosTime") Date posTime, @JsonProperty("Lat") Double latit, @JsonProperty("Long") Double longit, @JsonProperty("Spd") Double speed, @JsonProperty("Trak") Double trak, @JsonProperty("GAlt") Integer altitude)
@@ -34,43 +33,58 @@ public class BasicAircraft {
 	}
 
 	//getter methods
-	public String getIcao() {
+	public String getIcao()
+    {
 		return icao;
 	}
 
-	public Integer getSpecies() {
+	public Integer getSpecies()
+    {
 		return species;
 	}
 
-	public Date getPosTime() {
+	public Date getPosTime()
+    {
 		return posTime;
 	}
 
-	public Coordinate getCoordinate() {
+	public Coordinate getCoordinate()
+    {
 		return coordinate;
 	}
 
-	public Double getSpeed() {
+	public Double getSpeed()
+    {
 		return speed;
 	}
 
-	public Double getTrak() {
+	public Double getTrak()
+    {
 		return trak;
 	}
 
-	public Integer getAltitude() {
+	public Integer getAltitude()
+    {
 		return altitude;
 	}
 
-    //TODO: Lab 4-6 return attribute names and values for table
 	public static ArrayList<String> getAttributesNames()
 	{
-		return null;
+		Field[] fields = BasicAircraft.class.getDeclaredFields();                       //gets the Class variables into the Field class
+		ArrayList<String> variableList = new ArrayList<>();                                          //Array which is returned
+		for (Field k : fields)
+		{
+			String fString = k.toString();                                              //convert every field into a simple string
+			variableList.add(fString.substring(fString.lastIndexOf('.') + 1));      //only get the variable name instead of whole preceding namespace
+		}
+		return variableList;
 	}
 
 	public static ArrayList<Object> getAttributesValues(BasicAircraft ac)
 	{
-		return null;
+	    ArrayList<Object> acList = new ArrayList<>();
+	    acList.add(ac);
+        return acList;
 	}
 
 	//TODO: Overwrite toString() method to print fields

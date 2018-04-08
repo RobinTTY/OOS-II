@@ -41,7 +41,7 @@ import senser.Senser;
 //import com.lynden.gmapsfx.javascript.object.MarkerOptions;
 //import com.lynden.gmapsfx.util.MarkerImageFactory;
 
- public class UniversalAcMapView extends Application implements Observer
+ public class UniversalAcMapView //extends Application implements Observer
 {
 	private ActiveAircrafts activeAircrafts;
     private TableView<BasicAircraft> table = new TableView<BasicAircraft>();
@@ -53,7 +53,7 @@ import senser.Senser;
     private static boolean haveConnection = true;
     
     public static void main(String[] args) {
-		launch(args);
+		//launch(args);
     }
 	// TODO: For Lab 6 copy your AcMapView code here 
 }

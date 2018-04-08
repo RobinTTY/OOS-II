@@ -1,9 +1,7 @@
 package acamo;
-
 import java.util.*;
-
-import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import messer.*;
+import senser.AircraftSentence;
 
 //TODO: create hash map and complete all operations
 public class ActiveAircrafts implements Observer
@@ -39,9 +37,12 @@ public class ActiveAircrafts implements Observer
 	}
 
 	@Override
-	// TODO: store arg in hashmap using the method above
+	//store arg in Hashmap using the method above
 	public void update(Observable o, Object arg)
     {
-	    this.store();
+        //TODO: Check functionality
+        if(arg.equals(BasicAircraft.class)) System.out.println(true);
+		BasicAircraft ac = (BasicAircraft) arg;
+    	this.store(ac.getIcao(), ac);
 	}
 }

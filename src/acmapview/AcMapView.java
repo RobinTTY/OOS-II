@@ -27,16 +27,16 @@ import messer.BasicAircraft;
 import messer.*;
 import senser.Senser;
 
-import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.MapComponentInitializedListener;
-import com.lynden.gmapsfx.javascript.object.GoogleMap;
-import com.lynden.gmapsfx.javascript.object.LatLong;
-import com.lynden.gmapsfx.javascript.object.MapOptions;
-import com.lynden.gmapsfx.javascript.object.Marker;
-import com.lynden.gmapsfx.javascript.object.MarkerOptions;
-import com.lynden.gmapsfx.util.MarkerImageFactory;
+//import com.lynden.gmapsfx.GoogleMapView;
+//import com.lynden.gmapsfx.MapComponentInitializedListener;
+//import com.lynden.gmapsfx.javascript.object.GoogleMap;
+//import com.lynden.gmapsfx.javascript.object.LatLong;
+//import com.lynden.gmapsfx.javascript.object.MapOptions;
+//import com.lynden.gmapsfx.javascript.object.Marker;
+//import com.lynden.gmapsfx.javascript.object.MarkerOptions;
+//import com.lynden.gmapsfx.util.MarkerImageFactory;
 
-public class AcMapView extends Application implements Observer
+public class AcMapView //extends Application implements Observer
 {
 	private ActiveAircrafts activeAircrafts;
     private TableView<BasicAircraft> table = new TableView<BasicAircraft>();
@@ -48,7 +48,7 @@ public class AcMapView extends Application implements Observer
     private static boolean haveConnection = true;
     
     public static void main(String[] args) {
-		launch(args);
+		//launch(args);
     }
 
 	// TODO: For Lab 5 copy your Acamo code here 

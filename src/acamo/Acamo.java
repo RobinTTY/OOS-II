@@ -18,6 +18,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.concurrent.Task;
@@ -46,7 +47,7 @@ public class Acamo extends Application implements Observer
     public void start(Stage stage) {
 		String urlString = "https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json";
 		PlaneDataServer server;
-		
+		BasicAircraft.getAttributesNames();
 		if(haveConnection)
 			server = new PlaneDataServer(urlString, latitude, longitude, 50);
 		else
@@ -65,7 +66,8 @@ public class Acamo extends Application implements Observer
 		activeAircrafts = new ActiveAircrafts();
 		
 		// TODO: activeAircrafts and Acamo needs to observe messer  
-		
+
+        messer.addObserver(activeAircrafts);
         fields = BasicAircraft.getAttributesNames();
 
         // TODO: Fill column header using the attribute names from BasicAircraft
@@ -77,11 +79,11 @@ public class Acamo extends Application implements Observer
         table.autosize();
  
         // TODO: Create layout of table and pane for selected aircraft
-        
+        VBox layout1 = new VBox(20);
         // TODO: Add event handler for selected aircraft
- 
+
         
-		Scene scene = new Scene(...);
+		Scene scene = new Scene(layout1,1500,900, Color.ALICEBLUE);  //TODO: Change Values
         stage.setScene(scene);
         stage.setTitle("Acamo");
         stage.sizeToScene();
@@ -93,6 +95,5 @@ public class Acamo extends Application implements Observer
     // TODO: When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
     @Override
     public void update(Observable o, Object arg) {
-
     }
 }

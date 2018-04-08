@@ -26,8 +26,6 @@ public class Senser extends Observable implements Runnable
 	{
 		ArrayList<AircraftSentence> jsonAircraftList;
 		String aircraftList;
-		
-		//Create factory and display object
 		AircraftSentenceDisplay display = new AircraftSentenceDisplay();
 		AircraftSentenceFactory factory = new AircraftSentenceFactory();
 		
@@ -44,9 +42,7 @@ public class Senser extends Observable implements Runnable
 			/* if (lab1) */ System.out.println("Current Aircrafts in range " + jsonAircraftList.size());
 			for(AircraftSentence sentence : jsonAircraftList)
 			{
-				// Display the sentence in Lab 1; disable for other labs
-				if (lab1) display.display(sentence);
-				
+				if (lab1) display.display(sentence);	//print sentences to console
 				// Notify all observers
 				setChanged();
 				notifyObservers(sentence);
