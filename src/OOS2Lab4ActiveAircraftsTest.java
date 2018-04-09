@@ -1,3 +1,5 @@
+import java.beans.IntrospectionException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import acamo.ActiveAircrafts;
@@ -12,8 +14,7 @@ public class OOS2Lab4ActiveAircraftsTest
     private static double longitude = 9.3201122;
     private static boolean haveConnection = true;
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) throws IllegalAccessException, IntrospectionException, InvocationTargetException {
 		String urlString = "https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json";
 		PlaneDataServer server;
 		
@@ -47,7 +48,8 @@ public class OOS2Lab4ActiveAircraftsTest
 		for(BasicAircraft ba : aircrafts) {
 			System.out.println(ba);
 		}
-		BasicAircraft ba1 = aircrafts.get(0);
+		try{
+			BasicAircraft ba1 = aircrafts.get(0);
 		
 		// put this into comments while testing the hashtable alone
 		//*
@@ -57,6 +59,7 @@ public class OOS2Lab4ActiveAircraftsTest
 		for(int i = 0;i < attributesNames.size();i++) {
 			System.out.println("Name " + attributesNames.get(i) + "\tValue " + attributesValues.get(i));
 		}
+		} catch(IndexOutOfBoundsException e){}
 		//*/
 
 	}

@@ -8,7 +8,7 @@ import senser.AircraftSentence;
 
 public class Messer extends Observable implements Observer, Runnable
 {
-	private static boolean lab2 = true;
+	private static boolean lab2 = false;
 	private LinkedBlockingQueue<AircraftSentence> queue;
 	
 	public Messer()

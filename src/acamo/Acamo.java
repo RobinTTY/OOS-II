@@ -1,11 +1,9 @@
 package acamo;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -31,7 +29,7 @@ import senser.Senser;
 public class Acamo extends Application implements Observer
 {
 	private ActiveAircrafts activeAircrafts;
-    private TableView<BasicAircraft> table = new TableView<BasicAircraft>();
+    private TableView<BasicAircraft> table = new TableView<>();
     private ObservableList<BasicAircraft> aircraftList = FXCollections.observableArrayList();
     private ArrayList<String> fields;
  
@@ -40,50 +38,58 @@ public class Acamo extends Application implements Observer
     private static boolean haveConnection = true;
     
     public static void main(String[] args) {
-		launch(args);
+		launch(args);        //calls Application -> JavaFX start()
     }
  
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage)
+    {
 		String urlString = "https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json";
 		PlaneDataServer server;
 		BasicAircraft.getAttributesNames();
 		if(haveConnection)
-			server = new PlaneDataServer(urlString, latitude, longitude, 50);
+			server = new PlaneDataServer(urlString, latitude, longitude, 300);
 		else
 			server = new PlaneDataServer();
 		
-		new Thread(server).start();
-
-		Senser senser = new Senser(server);
-		new Thread(senser).start();
-		
-		Messer messer = new Messer();
-		senser.addObserver(messer);
-		new Thread(messer).start();
+		new Thread(server).start();                           //Server start
+		Senser senser = new Senser(server);                   //new Senser
+		new Thread(senser).start();                           //Senser start
+		Messer messer = new Messer();                         //new Messer
+		senser.addObserver(messer);                           //let Messer observe Senser
+		new Thread(messer).start();                           //start Messer
+        //Acamo acamo = new Acamo();
+        //messer.addObserver(acamo);
 		
 		// TODO: create activeAircrafts
 		activeAircrafts = new ActiveAircrafts();
-		
-		// TODO: activeAircrafts and Acamo needs to observe messer  
 
+		// TODO: activeAircrafts and Acamo needs to observe messer
         messer.addObserver(activeAircrafts);
+        messer.addObserver(this);
         fields = BasicAircraft.getAttributesNames();
 
         // TODO: Fill column header using the attribute names from BasicAircraft
-		for(int i = 0;i < fields.size();i++) {
+		for(int i = 0;i < fields.size();i++)
+		{
+		    try {
+                TableColumn<BasicAircraft, String> column = new TableColumn<>(fields.get(i));       //get column headers
+                column.setCellValueFactory(new PropertyValueFactory<>(fields.get(i)));              //get column values
+                table.getColumns().add(column);
+            } catch(IndexOutOfBoundsException e){ e.printStackTrace(); }
 		}
 		table.setItems(aircraftList);
-
 		table.setEditable(false);
         table.autosize();
  
         // TODO: Create layout of table and pane for selected aircraft
-        VBox layout1 = new VBox(20);
+        HBox root = new HBox(50);
+        root.setPadding(new Insets(20));
+        root.getChildren().add(table);
         // TODO: Add event handler for selected aircraft
 
-        
-		Scene scene = new Scene(layout1,1500,900, Color.ALICEBLUE);  //TODO: Change Values
+        //Scene
+		Scene scene = new Scene(root,1900,900, Color.CYAN);
         stage.setScene(scene);
         stage.setTitle("Acamo");
         stage.sizeToScene();
@@ -94,6 +100,15 @@ public class Acamo extends Application implements Observer
     
     // TODO: When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
     @Override
-    public void update(Observable o, Object arg) {
+    public void update(Observable o, Object arg)
+    {
+        try {
+            Thread.sleep(150);                       //sleep to ensure that activeAircrafts is updated when Acamo updates
+        } catch (InterruptedException e) {                //otherwise List could be empty
+            e.printStackTrace();
+        }
+        aircraftList.clear();
+        aircraftList.addAll(activeAircrafts.values());
+        table.setItems(aircraftList);
     }
 }
