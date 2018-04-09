@@ -28,7 +28,7 @@ import senser.Senser;
 
 public class Acamo extends Application implements Observer
 {
-	private ActiveAircrafts activeAircrafts;
+	private ActiveAircrafts activeAircrafts = new ActiveAircrafts();
     private TableView<BasicAircraft> table = new TableView<>();
     private ObservableList<BasicAircraft> aircraftList = FXCollections.observableArrayList();
     private ArrayList<String> fields;
@@ -48,7 +48,7 @@ public class Acamo extends Application implements Observer
 		PlaneDataServer server;
 		BasicAircraft.getAttributesNames();
 		if(haveConnection)
-			server = new PlaneDataServer(urlString, latitude, longitude, 300);
+			server = new PlaneDataServer(urlString, latitude, longitude, 100);
 		else
 			server = new PlaneDataServer();
 		
@@ -58,11 +58,6 @@ public class Acamo extends Application implements Observer
 		Messer messer = new Messer();                         //new Messer
 		senser.addObserver(messer);                           //let Messer observe Senser
 		new Thread(messer).start();                           //start Messer
-        //Acamo acamo = new Acamo();
-        //messer.addObserver(acamo);
-		
-		// TODO: create activeAircrafts
-		activeAircrafts = new ActiveAircrafts();
 
 		// TODO: activeAircrafts and Acamo needs to observe messer
         messer.addObserver(activeAircrafts);
@@ -75,13 +70,13 @@ public class Acamo extends Application implements Observer
 		    try {
                 TableColumn<BasicAircraft, String> column = new TableColumn<>(fields.get(i));       //get column headers
                 column.setCellValueFactory(new PropertyValueFactory<>(fields.get(i)));              //get column values
-                table.getColumns().add(column);
+                table.getColumns().add(column);                                                     //add columns
             } catch(IndexOutOfBoundsException e){ e.printStackTrace(); }
 		}
 		table.setItems(aircraftList);
 		table.setEditable(false);
         table.autosize();
- 
+
         // TODO: Create layout of table and pane for selected aircraft
         HBox root = new HBox(50);
         root.setPadding(new Insets(20));
@@ -96,19 +91,17 @@ public class Acamo extends Application implements Observer
         stage.setOnCloseRequest(e -> System.exit(0));
         stage.show();
     }
-
     
     // TODO: When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
     @Override
     public void update(Observable o, Object arg)
     {
         try {
-            Thread.sleep(150);                       //sleep to ensure that activeAircrafts is updated when Acamo updates
+            Thread.sleep(20);                       //sleep to ensure that activeAircrafts is updated when Acamo updates
         } catch (InterruptedException e) {                //otherwise List could be empty
             e.printStackTrace();
         }
         aircraftList.clear();
         aircraftList.addAll(activeAircrafts.values());
-        table.setItems(aircraftList);
     }
 }
