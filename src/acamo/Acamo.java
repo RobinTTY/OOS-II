@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
@@ -48,7 +49,7 @@ public class Acamo extends Application implements Observer
 		PlaneDataServer server;
 		BasicAircraft.getAttributesNames();
 		if(haveConnection)
-			server = new PlaneDataServer(urlString, latitude, longitude, 100);
+			server = new PlaneDataServer(urlString, latitude, longitude, 50);
 		else
 			server = new PlaneDataServer();
 		
@@ -81,7 +82,17 @@ public class Acamo extends Application implements Observer
         HBox root = new HBox(50);
         root.setPadding(new Insets(20));
         root.getChildren().add(table);
+
         // TODO: Add event handler for selected aircraft
+        VBox vBox = new VBox();
+        ArrayList<String> attributesNames = BasicAircraft.getAttributesNames();
+        Label header = new Label("Aircraft Information");
+        vBox.getChildren().add(header);
+        for(String attr : attributesNames)
+        {
+            vBox.getChildren().add(1, new Text(attr + ":"));
+        }
+        root.getChildren().add(vBox);
 
         //Scene
 		Scene scene = new Scene(root,1900,900, Color.CYAN);
@@ -96,12 +107,10 @@ public class Acamo extends Application implements Observer
     @Override
     public void update(Observable o, Object arg)
     {
-        try {
-            Thread.sleep(20);                       //sleep to ensure that activeAircrafts is updated when Acamo updates
-        } catch (InterruptedException e) {                //otherwise List could be empty
-            e.printStackTrace();
-        }
-        aircraftList.clear();
-        aircraftList.addAll(activeAircrafts.values());
+        synchronized (this)
+         {
+           aircraftList.clear();
+           aircraftList.addAll(activeAircrafts.values());
+         }
     }
 }
