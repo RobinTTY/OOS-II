@@ -2,12 +2,14 @@ package acamo;
 
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -33,6 +35,7 @@ public class Acamo extends Application implements Observer
     private TableView<BasicAircraft> table = new TableView<>();
     private ObservableList<BasicAircraft> aircraftList = FXCollections.observableArrayList();
     private ArrayList<String> fields;
+    private int activeAircraftsOld = activeAircrafts.values().size();
  
     private double latitude = 48.7433425;
     private double longitude = 9.3201122;
@@ -66,13 +69,14 @@ public class Acamo extends Application implements Observer
         fields = BasicAircraft.getAttributesNames();
 
         // TODO: Fill column header using the attribute names from BasicAircraft
+        aircraftList.addAll(activeAircrafts.values());
 		for(int i = 0;i < fields.size();i++)
 		{
 		    try {
                 TableColumn<BasicAircraft, String> column = new TableColumn<>(fields.get(i));       //get column headers
                 column.setCellValueFactory(new PropertyValueFactory<>(fields.get(i)));              //get column values
                 table.getColumns().add(column);                                                     //add columns
-            } catch(IndexOutOfBoundsException e){ e.printStackTrace(); }
+            } catch(IndexOutOfBoundsException e){ e.getMessage(); }                                 //some aircrafts have values missing
 		}
 		table.setItems(aircraftList);
 		table.setEditable(false);
@@ -102,15 +106,27 @@ public class Acamo extends Application implements Observer
         stage.setOnCloseRequest(e -> System.exit(0));
         stage.show();
     }
-    
+
+    class clickHandler implements EventHandler<ActionEvent>
+    {
+        public void handle(ActionEvent e)
+        {
+            //if(!aircraftList.contains(activeAircrafts.values().get(0)))
+            //activeAircrafts.values().contains()
+        }
+    }
+
+    public void outOfRangeCheck(){
+
+    }
+
+
     // TODO: When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
     @Override
     public void update(Observable o, Object arg)
     {
-        synchronized (this)
-         {
-           aircraftList.clear();
-           aircraftList.addAll(activeAircrafts.values());
-         }
+        aircraftList.clear();                                //clear observable list
+        aircraftList.addAll(activeAircrafts.values());       //add all from ActiveAircrafts Object
+        if(activeAircraftsOld != activeAircrafts.values().size()) outOfRangeCheck();
     }
 }

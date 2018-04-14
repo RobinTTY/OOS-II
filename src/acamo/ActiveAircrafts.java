@@ -41,7 +41,7 @@ public class ActiveAircrafts implements Observer
 	//store arg in Hashmap using the method above
 	public void update(Observable o, Object arg)
     {
-		BasicAircraft ac = (BasicAircraft) arg;
-    	this.store(ac.getIcao(), ac);
+			BasicAircraft ac = (BasicAircraft) arg;
+			this.store(ac.getIcao(), ac);
 	}
 }
