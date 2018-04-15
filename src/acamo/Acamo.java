@@ -1,6 +1,8 @@
 package acamo;
 
 
+import java.beans.IntrospectionException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
@@ -13,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -35,11 +38,11 @@ public class Acamo extends Application implements Observer
     private TableView<BasicAircraft> table = new TableView<>();
     private ObservableList<BasicAircraft> aircraftList = FXCollections.observableArrayList();
     private ArrayList<String> fields;
-    private int activeAircraftsOld = activeAircrafts.values().size();
  
     private double latitude = 48.7433425;
     private double longitude = 9.3201122;
     private static boolean haveConnection = true;
+    private int selectedIndex;
     
     public static void main(String[] args) {
 		launch(args);        //calls Application -> JavaFX start()
@@ -63,12 +66,12 @@ public class Acamo extends Application implements Observer
 		senser.addObserver(messer);                           //let Messer observe Senser
 		new Thread(messer).start();                           //start Messer
 
-		// TODO: activeAircrafts and Acamo needs to observe messer
+		//activeAircrafts and Acamo needs to observe messer
         messer.addObserver(activeAircrafts);
         messer.addObserver(this);
         fields = BasicAircraft.getAttributesNames();
 
-        // TODO: Fill column header using the attribute names from BasicAircraft
+        //fill column header using the attribute names from BasicAircraft
         aircraftList.addAll(activeAircrafts.values());
 		for(int i = 0;i < fields.size();i++)
 		{
@@ -82,24 +85,49 @@ public class Acamo extends Application implements Observer
 		table.setEditable(false);
         table.autosize();
 
-        // TODO: Create layout of table and pane for selected aircraft
-        HBox root = new HBox(50);
+        //create layout of table and pane for selected aircraft
+        HBox root = new HBox(50);                                           //HBox object as root
         root.setPadding(new Insets(20));
-        root.getChildren().add(table);
+        root.getChildren().add(table);                                              //add table
 
-        // TODO: Add event handler for selected aircraft
-        VBox vBox = new VBox();
+        GridPane gPan = new GridPane();
+        gPan.setPadding(new Insets(20));                            //GridPane for plane info
+        gPan.setHgap(3);                                                             //gap between elements
+        gPan.setVgap(3);
+
+        int attrIndex = 1;
         ArrayList<String> attributesNames = BasicAircraft.getAttributesNames();
         Label header = new Label("Aircraft Information");
-        vBox.getChildren().add(header);
+        gPan.getChildren().add(header);
         for(String attr : attributesNames)
         {
-            vBox.getChildren().add(1, new Text(attr + ":"));
+            gPan.add(new Text(attr + ":"),0, attrIndex);
+            attrIndex++;
         }
-        root.getChildren().add(vBox);
+        root.getChildren().add(gPan);
+
+        //handle mouse click event
+        table.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown()) {
+                selectedIndex = table.getSelectionModel().getSelectedIndex();       //get selected row
+                table.getSelectionModel().select(selectedIndex);                    //select selected row
+                BasicAircraft ua = table.getSelectionModel().getSelectedItem();     //get selected item
+                ArrayList<Object> uaValues = null;                                  //set gathered values to null initially
+                try {
+                    uaValues = BasicAircraft.getAttributesValues(ua);               //gather values trough BasicAircraft function
+                } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) { e.printStackTrace(); }
+                int valIndex = 1;
+                try{gPan.getChildren().remove(9,17);} catch(java.lang.IndexOutOfBoundsException e){}    //remove existing content
+                for (Object o : uaValues)
+                    try {
+                        gPan.add(new Text(o.toString()),1, valIndex);                       //display values
+                        valIndex++;                                                                     //index moves next element 1 row down
+                    } catch(java.lang.NullPointerException e) {}
+            }
+        });
 
         //Scene
-		Scene scene = new Scene(root,1900,900, Color.CYAN);
+		Scene scene = new Scene(root,1200,900, Color.CYAN);
         stage.setScene(scene);
         stage.setTitle("Acamo");
         stage.sizeToScene();
@@ -107,26 +135,16 @@ public class Acamo extends Application implements Observer
         stage.show();
     }
 
-    class clickHandler implements EventHandler<ActionEvent>
-    {
-        public void handle(ActionEvent e)
-        {
-            //if(!aircraftList.contains(activeAircrafts.values().get(0)))
-            //activeAircrafts.values().contains()
-        }
-    }
-
-    public void outOfRangeCheck(){
-
-    }
-
-
     // TODO: When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
     @Override
     public void update(Observable o, Object arg)
     {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         aircraftList.clear();                                //clear observable list
         aircraftList.addAll(activeAircrafts.values());       //add all from ActiveAircrafts Object
-        if(activeAircraftsOld != activeAircrafts.values().size()) outOfRangeCheck();
     }
 }
