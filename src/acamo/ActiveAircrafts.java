@@ -6,7 +6,6 @@ import messer.*;
 public class ActiveAircrafts implements Observer
 {
 	private HashMap<String , BasicAircraft> activeAircrafts;    	// store the basic aircraft and use its Icao as key
-																	// replace K and V with the correct class names
 
 	public ActiveAircrafts ()
 	{
@@ -37,11 +36,12 @@ public class ActiveAircrafts implements Observer
 		return activeAircrafts.toString();
 	}
 
+
 	@Override
 	//store arg in Hashmap using the method above
 	public void update(Observable o, Object arg)
     {
 		BasicAircraft ac = (BasicAircraft) arg;
-    	this.store(ac.getIcao(), ac);
+		this.store(ac.getIcao(), ac);
 	}
 }
