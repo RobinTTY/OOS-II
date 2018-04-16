@@ -92,16 +92,20 @@ public class Acamo extends Application implements Observer
 
         GridPane gPan = new GridPane();
         gPan.setPadding(new Insets(20));                            //GridPane for plane info
-        gPan.setHgap(3);                                                             //gap between elements
-        gPan.setVgap(3);
+        gPan.setHgap(3);                                                             //horizontal gap between elements
+        gPan.setVgap(3);                                                             //vertical gap
+        Font gFont = Font.font("Calibri Light", 18);                     //font used in gPan
 
         int attrIndex = 1;
         ArrayList<String> attributesNames = BasicAircraft.getAttributesNames();
-        Label header = new Label("Aircraft Information");
-        gPan.getChildren().add(header);
+        Label header = new Label("Aircraft Information");                       //Header
+        header.setFont(gFont);
+        gPan.add(header,0,0,2,1);              //span header across the two columns of gPan
         for(String attr : attributesNames)
         {
-            gPan.add(new Text(attr + ":"),0, attrIndex);
+            Text tmp = new Text(attr + ":");
+            tmp.setFont(gFont);
+            gPan.add(tmp,0, attrIndex);
             attrIndex++;
         }
         root.getChildren().add(gPan);
@@ -120,14 +124,16 @@ public class Acamo extends Application implements Observer
                 try{gPan.getChildren().remove(9,17);} catch(java.lang.IndexOutOfBoundsException e){}    //remove existing content
                 for (Object o : uaValues)
                     try {
-                        gPan.add(new Text(o.toString()),1, valIndex);                       //display values
-                        valIndex++;                                                                     //index moves next element 1 row down
+                        Text tmp = new Text(o.toString());
+                        tmp.setFont(gFont);     //enlarge text, change font
+                        gPan.add(tmp,1, valIndex);                       //display values in column 1 of GridPane
+                        valIndex++;                                                  //index moves next element 1 row down
                     } catch(java.lang.NullPointerException e) {}
             }
         });
 
         //Scene
-		Scene scene = new Scene(root,1200,900, Color.CYAN);
+		Scene scene = new Scene(root,1350,900, Color.CYAN);
         stage.setScene(scene);
         stage.setTitle("Acamo");
         stage.sizeToScene();
