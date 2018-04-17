@@ -92,15 +92,19 @@ public class BasicAircraft
 		return variableList;
 	}
 
-	public static ArrayList<Object> getAttributesValues(BasicAircraft ac) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+	public static ArrayList<Object> getAttributesValues(BasicAircraft ac) {
 	    ArrayList<Object> acList = new ArrayList<>();
-        BeanInfo info = Introspector.getBeanInfo(ac.getClass(),Object.class);   //get info about ac.class (BasicAircraft)
-        PropertyDescriptor[] props = info.getPropertyDescriptors();             //get PropertyDescriptors from info
-        for (PropertyDescriptor pd : props) {                                   //operate for each gathered PropertyDescriptor
-            Method getter = pd.getReadMethod();                                 //get getter Method for Property
-            acList.add(getter.invoke(ac));                                      //invoke getter Method and add the stored value to ArrayList
-        }
-        return acList;
+	    try
+		{
+			BeanInfo info = Introspector.getBeanInfo(ac.getClass(), Object.class);  	 //get info about ac.class (BasicAircraft)
+        	PropertyDescriptor[] props = info.getPropertyDescriptors();            		 //get PropertyDescriptors from info
+        	for (PropertyDescriptor pd : props)
+       		 {                                 											 //operate for each gathered PropertyDescriptor
+          	  	Method getter = pd.getReadMethod();                                		 //get getter Method for Property
+         	   	acList.add(getter.invoke(ac));                                     		 //invoke getter Method and add the stored value to ArrayList
+       		 }
+		} catch (IntrospectionException | IllegalAccessException | InvocationTargetException e){ e.printStackTrace(); }
+		return acList;
 	}
 
     @Override

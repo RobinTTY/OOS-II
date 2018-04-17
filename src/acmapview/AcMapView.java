@@ -110,9 +110,9 @@ public class AcMapView extends Application implements Observer
                 table.getSelectionModel().select(selectedIndex);                    //select selected row
                 BasicAircraft ua = table.getSelectionModel().getSelectedItem();     //get selected item
                 ArrayList<Object> uaValues = null;                                  //set gathered values to null initially
-                try {
+
                     uaValues = BasicAircraft.getAttributesValues(ua);               //gather values trough BasicAircraft function
-                } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) { e.printStackTrace(); }
+
                 int valIndex = 1;
                 try{gPan.getChildren().remove(9,17);} catch(java.lang.IndexOutOfBoundsException e){}    //remove existing content
                 for (Object o : uaValues)
