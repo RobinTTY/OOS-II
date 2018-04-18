@@ -100,10 +100,12 @@ public class BasicAircraft
         	PropertyDescriptor[] props = info.getPropertyDescriptors();            		 //get PropertyDescriptors from info
         	for (PropertyDescriptor pd : props)
        		 {                                 											 //operate for each gathered PropertyDescriptor
-          	  	Method getter = pd.getReadMethod();                                		 //get getter Method for Property
-         	   	acList.add(getter.invoke(ac));                                     		 //invoke getter Method and add the stored value to ArrayList
+       		     Method getter = pd.getReadMethod();                                	 //get getter Method for Property
+                 Object o = getter.invoke(ac);
+                 if(o == null) o = "[no data provided]";                                //if AircraftSentence lacks particular value, provide one -> keeps GridPane Info consistent
+                 acList.add(o);                                     		            //invoke getter Method and add the stored value to ArrayList
        		 }
-		} catch (IntrospectionException | IllegalAccessException | InvocationTargetException e){ e.printStackTrace(); }
+		} catch (IntrospectionException | IllegalAccessException | InvocationTargetException e){}
 		return acList;
 	}
 

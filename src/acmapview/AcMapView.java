@@ -48,7 +48,7 @@ public class AcMapView extends Application implements Observer
         PlaneDataServer server;
         BasicAircraft.getAttributesNames();
         if(haveConnection)
-            server = new PlaneDataServer(urlString, latitude, longitude, 50);
+            server = new PlaneDataServer(urlString, latitude, longitude, 250);
         else
             server = new PlaneDataServer();
 
@@ -66,14 +66,12 @@ public class AcMapView extends Application implements Observer
 
         //fill column header using the attribute names from BasicAircraft
         aircraftList.addAll(activeAircrafts.values());
-        for(int i = 0;i < fields.size();i++)
-        {
-            try {
-                TableColumn<BasicAircraft, String> column = new TableColumn<>(fields.get(i));       //get column headers
-                column.setCellValueFactory(new PropertyValueFactory<>(fields.get(i)));              //get column values
-                table.getColumns().add(column);                                                     //add columns
-            } catch(IndexOutOfBoundsException e){ e.getMessage(); }                                 //some aircrafts have values missing
+        for (String field : fields) {
+            TableColumn<BasicAircraft, String> column = new TableColumn<>(field);   //get column headers
+            column.setCellValueFactory(new PropertyValueFactory<>(field));          //get column values
+            table.getColumns().add(column);                                         //add columns
         }
+
         table.setItems(aircraftList);
         table.setEditable(false);
         table.autosize();
@@ -107,14 +105,13 @@ public class AcMapView extends Application implements Observer
         table.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
                 selectedIndex = table.getSelectionModel().getSelectedIndex();       //get selected row
-                table.getSelectionModel().select(selectedIndex);                    //select selected row
                 BasicAircraft ua = table.getSelectionModel().getSelectedItem();     //get selected item
-                ArrayList<Object> uaValues = null;                                  //set gathered values to null initially
-
-                    uaValues = BasicAircraft.getAttributesValues(ua);               //gather values trough BasicAircraft function
-
+                ArrayList<Object> uaValues;                                         //set gathered values to null initially
+                uaValues = BasicAircraft.getAttributesValues(ua);                   //gather values trough BasicAircraft function
                 int valIndex = 1;
-                try{gPan.getChildren().remove(9,17);} catch(java.lang.IndexOutOfBoundsException e){}    //remove existing content
+
+                try{gPan.getChildren().remove(9,gPan.getChildren().size());}        //indexes to be removed
+                catch(IndexOutOfBoundsException | IllegalArgumentException e){}     //remove existing content
                 for (Object o : uaValues)
                     try {
                         Text tmp = new Text(o.toString());
@@ -145,6 +142,7 @@ public class AcMapView extends Application implements Observer
         }
         aircraftList.clear();                                //clear observable list
         aircraftList.addAll(activeAircrafts.values());       //add all from ActiveAircrafts Object
+        table.getSelectionModel().select(selectedIndex);     //keep selected row highlighted
     }
 }
 
