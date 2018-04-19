@@ -2,13 +2,13 @@ package acmapview;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import jsonstream.PlaneDataServer;
 import messer.BasicAircraft;
 import messer.*;
+import de.saring.leafletmap.*;
 import senser.Senser;
 
 public class AcMapView extends Application implements Observer
@@ -81,6 +82,9 @@ public class AcMapView extends Application implements Observer
         root.setPadding(new Insets(20));
         root.getChildren().add(table);                                              //add table
 
+        VBox vB = new VBox();
+        root.getChildren().add(vB);
+
         GridPane gPan = new GridPane();
         gPan.setPadding(new Insets(20));                            //GridPane for plane info
         gPan.setHgap(3);                                                             //horizontal gap between elements
@@ -99,7 +103,30 @@ public class AcMapView extends Application implements Observer
             gPan.add(tmp,0, attrIndex);
             attrIndex++;
         }
-        root.getChildren().add(gPan);
+        vB.getChildren().add(gPan);
+
+        //TODO: Add Leafletmap
+        LeafletMapView lm = new LeafletMapView();
+        lm.setLayoutX(0);
+        lm.setLayoutY(0);
+        lm.setMaxWidth(640);
+        List<MapLayer> config = new LinkedList<>();
+        config.add(MapLayer.MAPBOX);
+        vB.getChildren().add(lm);
+
+        // Record the load state //TODO: What?!?!?!
+        CompletableFuture<Worker.State> loadState = lm.displayMap(
+                new MapConfig(config,
+                        new ZoomControlConfig(),
+                        new ScaleControlConfig(),
+                        new LatLong(latitude, longitude)));
+
+        // markers can only be added when the map is completes
+        loadState.whenComplete((state, throwable) -> {
+            Marker homeMarker = new Marker(new LatLong(latitude, longitude), "home", "home", 0);
+            lm.addCustomMarker("home", "planeIcons/basestationlarge.png");      // create home marker
+            lm.addMarker(homeMarker);                                                                    // add to map and remember the returned String
+                });
 
         //handle mouse click event
         table.setOnMousePressed(event -> {
