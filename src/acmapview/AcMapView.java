@@ -125,7 +125,7 @@ public class AcMapView extends Application implements Observer
         loadState.whenComplete((state, throwable) -> {
             Marker homeMarker = new Marker(new LatLong(latitude, longitude), "home", "home", 0);
             lm.addCustomMarker("home", "planeIcons/basestationlarge.png");      // create home marker
-            lm.addMarker(homeMarker);                                                                    // add to map and remember the returned String
+            lm.addMarker(homeMarker);                                                              // add to map and remember the returned String
                 });
 
         //handle mouse click event
