@@ -48,7 +48,7 @@ public class AcMapView extends Application implements Observer
         PlaneDataServer server;
         BasicAircraft.getAttributesNames();
         if(haveConnection)
-            server = new PlaneDataServer(urlString, latitude, longitude, 250);
+            server = new PlaneDataServer(urlString, latitude, longitude, 50);
         else
             server = new PlaneDataServer();
 
