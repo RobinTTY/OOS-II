@@ -1,10 +1,8 @@
 package acmapview;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
+
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -114,21 +112,48 @@ public class AcMapView extends Application implements Observer
         config.add(MapLayer.MAPBOX);
         vB.getChildren().add(lm);
 
-        // Record the load state //TODO: What?!?!?!
-        CompletableFuture<Worker.State> loadState = lm.displayMap(
-                new MapConfig(config,
-                        new ZoomControlConfig(),
-                        new ScaleControlConfig(),
-                        new LatLong(latitude, longitude)));
+        // Record the load state of the Map
+        CompletableFuture<Worker.State> loadState = lm.displayMap(new MapConfig(config, new ZoomControlConfig(), new ScaleControlConfig(), new LatLong(latitude, longitude)));
 
-        // markers can only be added when the map is completes
+        // markers can only be added when the map is loaded
         loadState.whenComplete((state, throwable) -> {
             Marker homeMarker = new Marker(new LatLong(latitude, longitude), "home", "home", 0);
-            lm.addCustomMarker("home", "planeIcons/basestationlarge.png");      // create home marker
-            lm.addMarker(homeMarker);                                                              // add to map and remember the returned String
-                });
+            lm.addCustomMarker("home", "planeIcons/basestationlarge.png");                              //create home marker
+            lm.addMarker(homeMarker);                                                                                      //add to map and remember the returned String
 
-        //handle mouse click event
+            // create plane icons
+            for(int i = 0; i <= 24; i++)
+            {
+                String number = String.format("%02d", i);
+                lm.addCustomMarker("plane" + number, "planeIcons/plane" + number + ".png");             //add plane icons
+            }
+        });
+
+        //Display Planes
+        HashMap<String, String> markerList = new HashMap<>();                         //key=icao, value=markerName
+
+        for(BasicAircraft ac : activeAircrafts.values()) {
+            int heading = ac.getTrak().intValue();                                    /* get the heading (Trak) as integer */
+            LatLong latlong = new LatLong(ac.getCoordinate().getLatitude(), ac.getCoordinate().getLongitude());
+            String icao = ac.getIcao();
+            String planeIcon =  "plane00.png";                                        /* get the right plane marker “planeXX” */;
+            if(markerList.containsKey(icao)){                                         /* ICAO is in hashmap*/
+            String markerName = ac.getIcao() + "marker";                                                   // update marker position and icon
+            //lm.moveMarker(markerName, latlong);
+
+            //lm.changeIconOfMarker(markerName, planeIcon);
+            }
+          else{
+                //addnewmarker
+                loadState.whenComplete((state, throwable) -> {
+                    Marker p = new Marker(latlong, icao, planeIcon, 0);
+                    lm.addMarker(p);
+                    markerList.put(icao, "wow");
+                });
+            }
+        }
+
+            //handle mouse click event
         table.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
                 selectedIndex = table.getSelectionModel().getSelectedIndex();       //get selected row
