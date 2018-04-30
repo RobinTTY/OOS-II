@@ -16,14 +16,14 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BasicAircraft
 {
-	private String icao;
-	private String operator;
-	private Integer species;
-	private Date posTime;
-	private Coordinate coordinate;
-	private Double speed;
-	private Double trak;
-	private Integer altitude;
+	private final String icao;
+	private final String operator;
+	private final Integer species;
+	private final Date posTime;
+	private final Coordinate coordinate;
+	private final Double speed;
+	private final Double trak;
+	private final Integer altitude;
 
     @JsonCreator
 	public BasicAircraft(@JsonProperty("Icao") String icao, @JsonProperty("Op") String operator, @JsonProperty("Species") Integer species, @JsonProperty("PosTime") Date posTime, @JsonProperty("Lat") Double latit, @JsonProperty("Long") Double longit, @JsonProperty("Spd") Double speed, @JsonProperty("Trak") Double trak, @JsonProperty("GAlt") Integer altitude)
@@ -105,7 +105,7 @@ public class BasicAircraft
                  if(o == null) o = "[no data provided]";                                //if AircraftSentence lacks particular value, provide one -> keeps GridPane Info consistent
                  acList.add(o);                                     		            //invoke getter Method and add the stored value to ArrayList
        		 }
-		} catch (IntrospectionException | IllegalAccessException | InvocationTargetException e){}
+		} catch (IntrospectionException | IllegalAccessException | InvocationTargetException e){ e.printStackTrace(); }
 		return acList;
 	}
 

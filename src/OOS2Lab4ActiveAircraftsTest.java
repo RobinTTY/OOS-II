@@ -1,20 +1,17 @@
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-
 import acmapview.ActiveAircrafts;
 import jsonstream.*;
 import messer.BasicAircraft;
 import messer.Messer;
 import senser.Senser;
 
-public class OOS2Lab4ActiveAircraftsTest
+class OOS2Lab4ActiveAircraftsTest
 {
-    private static double latitude = 48.7433425;
-    private static double longitude = 9.3201122;
-    private static boolean haveConnection = true;
+    private static final double latitude = 48.7433425;
+    private static final double longitude = 9.3201122;
+    private static final boolean haveConnection = true;
 
-	public static void main(String[] args) throws IllegalAccessException, IntrospectionException, InvocationTargetException {
+	public static void main(String[] args)  {
 		String urlString = "https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json";
 		PlaneDataServer server;
 		
@@ -38,7 +35,6 @@ public class OOS2Lab4ActiveAircraftsTest
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -59,7 +55,7 @@ public class OOS2Lab4ActiveAircraftsTest
 		for(int i = 0;i < attributesNames.size();i++) {
 			System.out.println("Name " + attributesNames.get(i) + "\tValue " + attributesValues.get(i));
 		}
-		} catch(IndexOutOfBoundsException e){}
+		} catch(IndexOutOfBoundsException e){ e.printStackTrace(); }
 		//*/
 
 	}

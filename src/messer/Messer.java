@@ -8,12 +8,12 @@ import senser.AircraftSentence;
 
 public class Messer extends Observable implements Observer, Runnable
 {
-	private static boolean lab2 = false;
-	private LinkedBlockingQueue<AircraftSentence> queue;
+    private final LinkedBlockingQueue<AircraftSentence> queue;
+    private boolean lab2 = false;
 	
 	public Messer()
 	{
-		this.queue = new LinkedBlockingQueue<AircraftSentence>();
+		this.queue = new LinkedBlockingQueue<>();
 	}
 
 	@Override
@@ -23,8 +23,7 @@ public class Messer extends Observable implements Observer, Runnable
 	}
 
 	public void run()
-	{ 
-		//TODO: Create factory and display object 
+	{
 		AircraftFactory factory = new AircraftFactory();
 		AircraftDisplay display = new AircraftDisplay();
 
@@ -43,10 +42,10 @@ public class Messer extends Observable implements Observer, Runnable
 				e.printStackTrace();
 			}
 
-			// Display the message in Lab 2; disable for other labs
-			if (lab2) display.display(msg);
 
-			// Notify all observers
+
+            if (lab2) display.display(msg);
+			//Notify all observers
 			setChanged();
 			notifyObservers(msg);
 		}

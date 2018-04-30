@@ -1,11 +1,11 @@
 import jsonstream.*;
 import senser.Senser;
 
-public class OOS2Lab1Starter
+class OOS2Lab1Starter
 {
-    private static double latitude = 48.7433425;
-    private static double longitude = 9.3201122;
-    private static boolean haveConnection = true;
+    private static final double latitude = 48.7433425;
+    private static final double longitude = 9.3201122;
+    private static final boolean haveConnection = true;
 
 	public static void main(String[] args)
 	{

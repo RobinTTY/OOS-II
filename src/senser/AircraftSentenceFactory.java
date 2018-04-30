@@ -1,11 +1,10 @@
 package senser;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class AircraftSentenceFactory
+class AircraftSentenceFactory
 {
-	public ArrayList<AircraftSentence> fromAircraftJson(String jsonAircraftString)
+	ArrayList<AircraftSentence> fromAircraftJson(String jsonAircraftString)
 	{
 		ArrayList<AircraftSentence>  jsonAircraftList = new ArrayList<>();		                //jsonAircraftList shall contain AircraftSentences //explicit type argument
 		jsonAircraftString = jsonAircraftString.substring(1,jsonAircraftString.length() - 1);	//create new substring to get rid of first and last curly brace

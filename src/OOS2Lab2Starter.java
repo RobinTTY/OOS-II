@@ -2,9 +2,9 @@ import jsonstream.*;
 import messer.Messer;
 import senser.Senser;
 
-public class OOS2Lab2Starter
+class OOS2Lab2Starter
 {
-    private static double latitude = 48.7433425;
+    private static final double latitude = 48.7433425;
     private static double longitude = 9.3201122;
     private static boolean haveConnection = true;
 

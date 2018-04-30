@@ -2,14 +2,14 @@ package senser;
 
 public class AircraftSentence
 {
-    public String aircraftJson;
+    private final String aircraftJson;
 
     AircraftSentence(String token)
     {
         this.aircraftJson = token;
     }
 
-	public String getAircraftJson()
+	private String getAircraftJson()
     {
         return aircraftJson;
     }

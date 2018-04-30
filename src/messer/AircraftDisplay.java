@@ -1,8 +1,8 @@
 package messer;
 
-public class AircraftDisplay
+class AircraftDisplay
 {
-	public void display ( BasicAircraft msg )
+	void display(BasicAircraft msg)
     {
 		System.out.println(msg);
 	}

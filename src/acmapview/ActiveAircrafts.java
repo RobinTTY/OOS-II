@@ -2,17 +2,16 @@ package acmapview;
 import java.util.*;
 import messer.*;
 
-//TODO: create hash map and complete all operations
 public class ActiveAircrafts implements Observer
 {
-	private HashMap<String , BasicAircraft> activeAircrafts;    	// store the basic aircraft and use its Icao as key
+	private final HashMap<String , BasicAircraft> activeAircrafts;		//string = icao
 
 	public ActiveAircrafts ()
 	{
 		activeAircrafts = new HashMap<>();
 	}
 
-	public synchronized void store(String icao, BasicAircraft ac)
+	private synchronized void store(String icao, BasicAircraft ac)
     {
 		activeAircrafts.put(icao,ac);
 	}
