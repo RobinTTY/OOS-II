@@ -49,7 +49,7 @@ public class AcMapView extends Application implements Observer
         String urlString = "https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json";
         PlaneDataServer server;
         if(haveConnection)
-            server = new PlaneDataServer(urlString, latitude, longitude, 250);
+            server = new PlaneDataServer(urlString, latitude, longitude, 50);
         else
             server = new PlaneDataServer();
 
@@ -184,22 +184,24 @@ public class AcMapView extends Application implements Observer
 
         //update acIcons on map
             Platform.runLater(() -> {                            //updating a JavaFX thread -> runLater()
+                try {
                 for (BasicAircraft ac : aircraftList) {
-                    LatLong latlong = new LatLong(ac.getCoordinate().getLatitude(), ac.getCoordinate().getLongitude());
-                    String icao = ac.getIcao();
-                    String planeIcon = acIconPicker(ac.getTrak());                                 //pass track to picker to get correct icon name
-                    if (markerList.containsKey(icao)) {                                            //ICAO is in hashmap
-                        Marker acMarker = markerList.get(icao);                                    //update marker position and icon
-                        acMarker.move(latlong);
-                        acMarker.changeIcon(planeIcon);
-                    } else {
-                        loadState.whenComplete((state, throwable) -> {                             //ICAO isn't in HashMap
-                            Marker p = new Marker(latlong, icao, planeIcon, 0);        //add new marker
-                            markerList.put(icao, p);
-                            lm.addMarker(p);
-                        });
+                        LatLong latlong = new LatLong(ac.getCoordinate().getLatitude(), ac.getCoordinate().getLongitude());
+                        String icao = ac.getIcao();
+                        String planeIcon = acIconPicker(ac.getTrak());                                 //pass track to picker to get correct icon name
+                        if (markerList.containsKey(icao)) {                                            //ICAO is in hashmap
+                            Marker acMarker = markerList.get(icao);                                    //update marker position and icon
+                            acMarker.move(latlong);
+                            acMarker.changeIcon(planeIcon);
+                        } else {
+                            loadState.whenComplete((state, throwable) -> {                             //ICAO isn't in HashMap
+                                Marker p = new Marker(latlong, icao, planeIcon, 0);        //add new marker
+                                markerList.put(icao, p);
+                                lm.addMarker(p);
+                            });
+                        }
                     }
-                }
+                } catch(NullPointerException | ConcurrentModificationException ignore){}              //if ac doesn't provide required data, don't include it | if other Thread is accessing aircraft List, it can't be used to update icons
             });
     }
 }
