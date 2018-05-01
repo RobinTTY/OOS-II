@@ -9,10 +9,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -35,7 +34,7 @@ public class UniversalAcMapView extends Application implements Observer
 
     private final double latitude = 48.7433425;
     private final double longitude = 9.3201122;
-    private final int distance = 200;
+    private final int distance = 50;
     private final boolean haveConnection = true;
     private int selectedIndex;
 
@@ -83,14 +82,83 @@ public class UniversalAcMapView extends Application implements Observer
         table.setEditable(false);
         table.autosize();
 
-        //create layout of table and pane for selected aircraft
+        //root HBox containing table
         HBox root = new HBox(50);
         root.setPadding(new Insets(20));
         root.getChildren().add(table);
 
+        //Scene
+        Scene scene = new Scene(root,1350,900, Color.CYAN);
+        stage.setScene(scene);
+        stage.setTitle("Acamo");
+        stage.sizeToScene();
+        stage.setOnCloseRequest(e -> System.exit(0));
+        stage.show();
+
         //vBox containing AircraftInformation + Map
         VBox vB = new VBox();
         root.getChildren().add(vB);
+
+        //Menu Bar
+        MenuBar menuBar = new MenuBar();
+        Menu fileMenu = new Menu("File");
+        MenuItem exit = new MenuItem("Exit");
+        fileMenu.getItems().add(exit);
+        Menu serverMenu = new Menu("Connection");
+        MenuItem resLoc = new MenuItem("Reset Location");
+        serverMenu.getItems().add(resLoc);
+        menuBar.getMenus().addAll(fileMenu, serverMenu);
+        vB.getChildren().add(menuBar);
+
+        //exit handler
+        exit.setOnAction(event -> System.exit(0));
+
+        //reset location handler
+        resLoc.setOnAction(event -> {
+                    //Dialog for reset location handler
+                    Dialog<String[]> resLocDialog = new Dialog<>();
+                    resLocDialog.setHeaderText("Please provide the new Coordinates");
+                    //resLoc.setGraphic();
+                    resLocDialog.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
+                    GridPane grid = new GridPane();         //content
+                    grid.setHgap(10);
+                    grid.setVgap(10);
+                    grid.setPadding(new Insets(20, 150, 10, 10));
+                    //fields
+                    TextField latIn = new TextField();
+                    latIn.setPromptText("latitude");
+                    TextField longIn = new TextField();
+                    longIn.setPromptText("longitude");
+                    //add fields
+                    grid.add(new Label("latitude:"), 0, 0);
+                    grid.add(latIn, 1, 0);
+                    grid.add(new Label("longitude:"), 0, 1);
+                    grid.add(longIn, 1, 1);
+                    // Enable/Disable apply button depending on whether a username was entered.
+                    Node applyButton = resLocDialog.getDialogPane().lookupButton(ButtonType.APPLY);
+                    applyButton.setDisable(true);
+                    //listen to input
+                    latIn.textProperty().addListener((observable, oldValue, newValue) -> applyButton.setDisable(newValue.trim().isEmpty()));
+                    //add content
+                    resLocDialog.getDialogPane().setContent(grid);
+                    //return values
+                    resLocDialog.setResultConverter(dialogButton -> {
+                        if (dialogButton == ButtonType.APPLY) {
+                            String retArr[] = new String[2];
+                            retArr[0] = latIn.getText();
+                            retArr[1] = longIn.getText();
+                            return retArr;
+                        }
+                        return null;
+                    });
+                    //collect result
+                    Optional<String[]> result = resLocDialog.showAndWait();
+                    try {
+                        result.ifPresent(strings -> resetLocation(Double.parseDouble(strings[0]), Double.parseDouble(strings[1]), distance, server));
+                    } catch(NumberFormatException e){
+                        System.out.println("Input wasn't in the right format");
+                    }
+                });
 
         //GridPane for Aircraft information
         GridPane gPan = new GridPane();
@@ -158,17 +226,7 @@ public class UniversalAcMapView extends Application implements Observer
         });
 
         //handle click on map
-        loadState.whenComplete((state, throwable) -> lm.onMapClick(latLong -> {
-            resetLocation(latLong.getLatitude(),latLong.getLongitude(), distance, server);
-            lm.setView(latLong, 8);
-        }));
-
-        Scene scene = new Scene(root,1350,900, Color.CYAN);
-        stage.setScene(scene);
-        stage.setTitle("Acamo");
-        stage.sizeToScene();
-        stage.setOnCloseRequest(e -> System.exit(0));
-        stage.show();
+        loadState.whenComplete((state, throwable) -> lm.onMapClick(latLong -> resetLocation(latLong.getLatitude(),latLong.getLongitude(), distance, server)));
     }
 
     private String acIconPicker(double track)
@@ -187,6 +245,7 @@ public class UniversalAcMapView extends Application implements Observer
         }
         homeMarker.move(new LatLong(lat,lng));
         markerList.clear();                             //clear all markers
+        lm.setView(new LatLong(lat, lng), 8);
     }
 
     //When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
@@ -224,6 +283,9 @@ public class UniversalAcMapView extends Application implements Observer
                 }
             } catch(NullPointerException | ConcurrentModificationException ignore){}              //if ac doesn't provide required data, don't include it | if other Thread is accessing aircraft List, it can't be used to update icons
         });
+
+        //if (markerList.size() > aircraftList.size()) markerList.clear();
+        System.out.println(markerList.size() + "," + aircraftList.size());
     }
 }
 
