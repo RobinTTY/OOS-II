@@ -106,7 +106,8 @@ public class UniversalAcMapView extends Application implements Observer
         fileMenu.getItems().add(exit);
         Menu serverMenu = new Menu("Connection");
         MenuItem resLoc = new MenuItem("Reset Location");
-        serverMenu.getItems().add(resLoc);
+        MenuItem stopServer = new MenuItem("Stop Server");
+        serverMenu.getItems().addAll(resLoc, stopServer);
         menuBar.getMenus().addAll(fileMenu, serverMenu);
         vB.getChildren().add(menuBar);
 
@@ -159,6 +160,9 @@ public class UniversalAcMapView extends Application implements Observer
                         System.out.println("Input wasn't in the right format");
                     }
                 });
+
+        //stop server handler
+        stopServer.setOnAction(event -> server.stop());
 
         //GridPane for Aircraft information
         GridPane gPan = new GridPane();
@@ -248,6 +252,13 @@ public class UniversalAcMapView extends Application implements Observer
         lm.setView(new LatLong(lat, lng), 8);
     }
 
+    private void clearMarkers(){
+        for (Marker anMarker : markerList.values()) {
+            lm.removeMarker(anMarker);
+        }
+        markerList.clear();
+    }
+
     //When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
     @Override
     public void update(Observable o, Object arg) {
@@ -282,10 +293,12 @@ public class UniversalAcMapView extends Application implements Observer
                     }
                 }
             } catch(NullPointerException | ConcurrentModificationException ignore){}              //if ac doesn't provide required data, don't include it | if other Thread is accessing aircraft List, it can't be used to update icons
+            if (aircraftList.size() - markerList.size() > 4) {                                    //easy fix for markers not getting removed after base station relocate
+                clearMarkers();                                                                   //not optimal
+                markerList.clear();
+                activeAircrafts.clear();
+            }
         });
-
-        //if (markerList.size() > aircraftList.size()) markerList.clear();
-        System.out.println(markerList.size() + "," + aircraftList.size());
     }
 }
 
