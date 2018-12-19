@@ -5,6 +5,7 @@ import java.sql.*;
 import java.util.concurrent.CompletableFuture;
 
 import acmapview.ActiveAircrafts;
+import acmapview.Database;
 import de.saring.leafletmap.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -31,7 +32,7 @@ import senser.Senser;
 public class UniversalAcMapView extends Application implements Observer {
     private final ActiveAircrafts activeAircrafts = new ActiveAircrafts();
     private final TableView<BasicAircraft> table = new TableView<>();
-    private final ObservableList<BasicAircraft> aircraftList = FXCollections.observableArrayList();
+    private ObservableList<BasicAircraft> aircraftList = FXCollections.observableArrayList();
     private final HashMap<String, Marker> markerList = new HashMap<>();
 
     private final double latitude = 48.7433425;
@@ -39,12 +40,7 @@ public class UniversalAcMapView extends Application implements Observer {
     private final int distance = 50;
     private final boolean haveConnection = true;
     private int selectedIndex;
-
-    //Declare the JDBC objects
-    private Connection con = null;
-    private Statement stmt = null;
-    private ResultSet rs = null;
-    private String SQL;
+    private Database db = new Database();
 
     private CompletableFuture<Worker.State> loadState;
     private LeafletMapView lm;
@@ -64,32 +60,7 @@ public class UniversalAcMapView extends Application implements Observer {
             server = new PlaneDataServer();
 
         ////////// connect to database //////////
-        // Create a variable for the connection string
-        try {
-            // Establish connection
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String connectionUrl = "jdbc:sqlserver://134.108.190.89:1433;" + "databaseName=WKB4_DB2_Projekt;user=wkb4;password=wkb4";
-            con = DriverManager.getConnection(connectionUrl);
-
-            // Create and execute an SQL statement that returns some data
-            SQL = "SELECT * FROM dbo.romuit02_Planes";
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(SQL);
-
-            // Iterate trough the data in the result set and display it
-            while (rs.next()) {
-                System.out.println("Id: " + rs.getString(1) + " - icao: " + rs.getString(2) + " - operator: " + rs.getString(3) + " - species: " + rs.getString(4) + " - posTime: " + rs.getString(5) + " - latitude: " + rs.getString(6) + " - longitude: " + rs.getString(7) + " - speed: " + rs.getString(8) + " - trak: " + rs.getString(9) + " - altitude: " + rs.getString(10));
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            CloseResultSet();
-            CloseStatement();
-            System.out.println("Connection to database successfully initiated!");
-        }
-        ////////// connect to database //////////
+        db.connect("jdbc:sqlserver://134.108.190.89:1433;" + "databaseName=WKB4_DB2_Projekt;user=wkb4;password=wkb4");
 
         // start modules
         new Thread(server).start();                           //Server start
@@ -103,6 +74,7 @@ public class UniversalAcMapView extends Application implements Observer {
         //activeAircrafts and Acamo needs to observe messer
         messer.addObserver(activeAircrafts);
         new Thread(activeAircrafts).start();
+        messer.addObserver(db);
         activeAircrafts.addObserver(this);
 
         //fill table column headers
@@ -151,12 +123,7 @@ public class UniversalAcMapView extends Application implements Observer {
         //exit handler
         exit.setOnAction(event -> {
             System.exit(0);
-            if (con != null) try {
-                con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Exception while closing con");
-            }
+            db.disconnect();
         });
 
         //reset location handler
@@ -284,24 +251,6 @@ public class UniversalAcMapView extends Application implements Observer {
         loadState.whenComplete((state, throwable) -> lm.onMapClick(latLong -> resetLocation(latLong.getLatitude(), latLong.getLongitude(), distance, server)));
     }
 
-    private void CloseStatement() {
-        if (stmt != null) try {
-            stmt.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Exception while closing stmt");
-        }
-    }
-
-    private void CloseResultSet() {
-        if (rs != null) try {
-            rs.close();
-        } catch (SQLException e) {
-            System.out.println("Exception while closing rs");
-            e.printStackTrace();
-        }
-    }
-
     private String acIconPicker(double track) {
         int iTrack = (int) Math.round(track / 15);                //360 Degrees, 24 PlaneIcons -> 360/24=15 - double value is required to round correctly
         return "plane" + String.format("%02d", iTrack);           //select right aircraft icon
@@ -324,53 +273,6 @@ public class UniversalAcMapView extends Application implements Observer {
         lm.setView(new LatLong(lat, lng), 8);
     }
 
-    private void CheckDbForPlane(ArrayList<BasicAircraft> acList) {
-        ArrayList<String> results = new ArrayList<>();
-        try {
-            // Check if plane already in database
-            SQL = "SELECT icao FROM dbo.romuit02_Planes";
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(SQL);
-
-            while(rs.next()){
-                results.add(rs.getString(1));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            CloseResultSet();
-            CloseStatement();
-        }
-        for(BasicAircraft ac: acList){
-            if(results.contains(ac.getIcao())) continue;
-            AddToDb(ac);
-        }
-    }
-
-    private int getMaxId(){
-        try {
-            SQL = "SELECT MAX(id) FROM dbo.romuit02_Planes";
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(SQL);
-            rs.next();
-            return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    private void AddToDb(BasicAircraft ac) {
-        SQL = "INSERT INTO romuit02_Planes VALUES (" + (getMaxId()+ 1) + ",'" + ac.getIcao() + "','" + ac.getOperator() + "'," + ac.getSpecies() + ",'" + new Timestamp(ac.getPosTime().getTime()) + "'," + ac.getCoordinate().getLatitude() + "," + ac.getCoordinate().getLongitude() + "," + ac.getSpeed() + "," + ac.getTrak() + "," + ac.getAltitude() + ")";
-        try {
-            stmt = con.createStatement();
-            stmt.execute(SQL);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println(SQL.toString());
-    }
-
     private void clearMarkers() {
         for (Marker anMarker : markerList.values()) {
             lm.removeMarker(anMarker);
@@ -388,11 +290,7 @@ public class UniversalAcMapView extends Application implements Observer {
         }
         //update ac in observable list
         aircraftList.clear();                                //clear observable list
-        aircraftList.addAll(activeAircrafts.values());       //add all from ActiveAircrafts Object
-
-        ////////// insert planes into database //////////
-        CheckDbForPlane(activeAircrafts.values());
-        ////////// insert planes into database //////////
+        aircraftList = db.GetCurrentAircrafts();       //add all from ActiveAircrafts Object
 
         //update acIcons on map
         table.getSelectionModel().select(selectedIndex);     //keep selected row highlighted
