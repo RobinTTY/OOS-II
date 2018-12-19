@@ -35,9 +35,15 @@ public class UniversalAcMapView extends Application implements Observer
 
     private final double latitude = 48.7433425;
     private final double longitude = 9.3201122;
-    private final int distance = 50;
+    private final int distance = 150;
     private final boolean haveConnection = true;
     private int selectedIndex;
+
+    //Declare the JDBC objects
+    private Connection con = null;
+    private Statement stmt = null;
+    private ResultSet rs = null;
+    private String SQL;
 
     private CompletableFuture<Worker.State> loadState;
     private LeafletMapView lm;
@@ -59,25 +65,20 @@ public class UniversalAcMapView extends Application implements Observer
 
         ////////// connect to database //////////
         // Create a variable for the connection string
-        String connectionUrl = "jdbc:sqlserver://134.108.190.89:1433;" + "databaseName=WKB4_DB2_Projekt;user=wkb4;password=wkb4";
-        //Declare the JDBC objects
-        Connection con = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-
         try{
             // Establish connection
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            String connectionUrl = "jdbc:sqlserver://134.108.190.89:1433;" + "databaseName=WKB4_DB2_Projekt;user=wkb4;password=wkb4";
             con = DriverManager.getConnection(connectionUrl);
 
             // Create and execute an SQL statement that returns some data
-            String SQL = "SELECT * FROM dbo.romuit02_Planes";
+            SQL = "SELECT * FROM dbo.romuit02_Planes";
             stmt = con.createStatement();
             rs = stmt.executeQuery(SQL);
 
             // Iterate trough the data in the result set and display it
             while(rs.next()){
-                System.out.println(rs.getString(1) + rs.getString(2) + rs.getString(3) + rs.getString(4) + rs.getString(5) + rs.getString(6) + rs.getString(7) + rs.getString(8) + rs.getString(9) + rs.getString(10));
+                System.out.println("Id: " + rs.getString(1) + " - icao: " + rs.getString(2) + " - operator: " + rs.getString(3) + " - species: " + rs.getString(4) + " - posTime: " + rs.getString(5) + " - latitude: " + rs.getString(6) + " - longitude: " + rs.getString(7) +" - speed: " + rs.getString(8) + " - trak: " + rs.getString(9) + " - altitude: " + rs.getString(10));
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -102,6 +103,7 @@ public class UniversalAcMapView extends Application implements Observer
                 e.printStackTrace();
                 System.out.println("Exception while closing con");
             }
+            System.out.println("Connection to database successfully initiated!");
         }
 
 
@@ -300,8 +302,22 @@ public class UniversalAcMapView extends Application implements Observer
             lm.removeMarker(anMarker);
         }
         homeMarker.move(new LatLong(lat,lng));
-        markerList.clear();                             //clear all markers
+        //markerList.clear();                             //clear all markers
         lm.setView(new LatLong(lat, lng), 8);
+    }
+
+    private void insertIntoDb(ArrayList<BasicAircraft> acList){
+        SQL = "SELECT icao FROM dbo.romuit02_Planes";
+        try {
+            stmt = con.createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            rs = stmt.executeQuery(SQL);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void clearMarkers(){
@@ -311,28 +327,32 @@ public class UniversalAcMapView extends Application implements Observer
         markerList.clear();
     }
 
-    //When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
+    // When messer updates Acamo (and activeAircrafts) the aircraftList must be updated as well
     @Override
     public void update(Observable o, Object arg) {
         try {
-            Thread.sleep(25);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         //update ac in observable list
         aircraftList.clear();                                //clear observable list
         aircraftList.addAll(activeAircrafts.values());       //add all from ActiveAircrafts Object
-        table.getSelectionModel().select(selectedIndex);     //keep selected row highlighted
+
+
+        ////////// insert planes into database //////////
+        //insertIntoDb(activeAircrafts.values());
+        ////////// insert planes into database //////////
 
         //update acIcons on map
+        table.getSelectionModel().select(selectedIndex);     //keep selected row highlighted
         Platform.runLater(() -> {                            //updating a JavaFX thread -> runLater()
             try {
                 for (BasicAircraft ac : aircraftList) {
                     LatLong latlong = new LatLong(ac.getCoordinate().getLatitude(), ac.getCoordinate().getLongitude());
                     String icao = ac.getIcao();
                     String planeIcon = acIconPicker(ac.getTrak());                                 //pass track to picker to get correct icon name
-                    if (markerList.containsKey(icao)) {                                            //ICAO is in hashmap
+                    if (markerList.containsKey(icao)) {                                           //ICAO is in hashmap
                         Marker acMarker = markerList.get(icao);                                    //update marker position and icon
                         acMarker.move(latlong);
                         acMarker.changeIcon(planeIcon);
@@ -345,11 +365,6 @@ public class UniversalAcMapView extends Application implements Observer
                     }
                 }
             } catch(NullPointerException | ConcurrentModificationException ignore){}              //if ac doesn't provide required data, don't include it | if other Thread is accessing aircraft List, it can't be used to update icons
-            if (aircraftList.size() - markerList.size() > 4) {                                    //easy fix for markers not getting removed after base station relocate
-                clearMarkers();                                                                   //not optimal
-                markerList.clear();
-                activeAircrafts.clear();
-            }
         });
     }
 }
