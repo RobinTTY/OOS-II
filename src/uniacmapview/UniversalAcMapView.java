@@ -1,5 +1,6 @@
 package uniacmapview;
 import java.util.*;
+import java.sql.*;
 import java.util.concurrent.CompletableFuture;
 import acmapview.ActiveAircrafts;
 import de.saring.leafletmap.*;
@@ -56,6 +57,57 @@ public class UniversalAcMapView extends Application implements Observer
         else
             server = new PlaneDataServer();
 
+        ////////// connect to database //////////
+        // Create a variable for the connection string
+        String connectionUrl = "jdbc:sqlserver://134.108.190.89:1433;" + "databaseName=WKB4_DB2_Projekt;user=wkb4;password=wkb4";
+        //Declare the JDBC objects
+        Connection con = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try{
+            // Establish connection
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            con = DriverManager.getConnection(connectionUrl);
+
+            // Create and execute an SQL statement that returns some data
+            String SQL = "SELECT * FROM dbo.romuit02_Planes";
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(SQL);
+
+            // Iterate trough the data in the result set and display it
+            while(rs.next()){
+                System.out.println(rs.getString(1) + rs.getString(2) + rs.getString(3) + rs.getString(4) + rs.getString(5) + rs.getString(6) + rs.getString(7) + rs.getString(8) + rs.getString(9) + rs.getString(10));
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) try {
+                rs.close();
+            } catch (SQLException e) {
+                System.out.println("Exception while closing rs");
+                e.printStackTrace();
+            }
+            if (stmt != null) try {
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Exception while closing stmt");
+            }
+            if (con != null) try {
+                con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Exception while closing con");
+            }
+        }
+
+
+            ////////// connect to database //////////
+
+        // start modules
         new Thread(server).start();                           //Server start
         Senser senser = new Senser(server);                   //new Senser
         senser.acInRange = true;                              //show console output aircraft in range

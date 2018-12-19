@@ -62,5 +62,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="mssql-jdbc-7.0.0.jre8" level="project" />
   </component>
 </module>
