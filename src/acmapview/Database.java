@@ -52,6 +52,16 @@ public class Database implements Observer {
         return acList;
     }
 
+    public void deleteOldPlanes(){
+        sqlQuery = "romuit02_ClearOldPlanes -10";
+        this.executeSqlStatement();
+    }
+
+    public void deletePlanes(){
+        sqlQuery = "romuit02_ClearPlanes";
+        this.executeSqlStatement();
+    }
+
     public void disconnect(){
         if (connection != null) try {
             connection.close();
@@ -113,7 +123,6 @@ public class Database implements Observer {
             e.printStackTrace();
         } finally {
             CloseResultSet();
-            CloseStatement();
         }
     }
 
@@ -128,7 +137,6 @@ public class Database implements Observer {
             e.printStackTrace();
         }
         CloseResultSet();
-        CloseStatement();
         return 0;
     }
 
@@ -150,13 +158,11 @@ public class Database implements Observer {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        CloseStatement();
     }
 
     @Override
     public void update(Observable o, Object arg) {
         BasicAircraft ac = (BasicAircraft) arg;
         this.AddPlaneToDb(ac);
-        this.GetCurrentAircrafts();
     }
 }

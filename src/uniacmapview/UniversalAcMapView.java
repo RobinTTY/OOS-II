@@ -37,7 +37,7 @@ public class UniversalAcMapView extends Application implements Observer {
 
     private final double latitude = 48.7433425;
     private final double longitude = 9.3201122;
-    private final int distance = 50;
+    private final int distance = 80;
     private final boolean haveConnection = true;
     private int selectedIndex;
     private Database db = new Database();
@@ -61,6 +61,7 @@ public class UniversalAcMapView extends Application implements Observer {
 
         ////////// connect to database //////////
         db.connect("jdbc:sqlserver://134.108.190.89:1433;" + "databaseName=WKB4_DB2_Projekt;user=wkb4;password=wkb4");
+        ////////// connect to database //////////
 
         // start modules
         new Thread(server).start();                           //Server start
@@ -79,7 +80,7 @@ public class UniversalAcMapView extends Application implements Observer {
 
         //fill table column headers
         ArrayList<String> attributeNames = BasicAircraft.getAttributesNames();
-        aircraftList.addAll(activeAircrafts.values());
+        aircraftList = db.GetCurrentAircrafts();
         for (String field : attributeNames) {
             TableColumn<BasicAircraft, String> column = new TableColumn<>(field);   //get column headers
             column.setCellValueFactory(new PropertyValueFactory<>(field));          //get column values
@@ -248,7 +249,10 @@ public class UniversalAcMapView extends Application implements Observer {
         });
 
         //handle click on map
-        loadState.whenComplete((state, throwable) -> lm.onMapClick(latLong -> resetLocation(latLong.getLatitude(), latLong.getLongitude(), distance, server)));
+        loadState.whenComplete((state, throwable) -> lm.onMapClick(latLong -> {
+            resetLocation(latLong.getLatitude(), latLong.getLongitude(), distance, server);
+            db.deletePlanes();
+        }));
     }
 
     private String acIconPicker(double track) {
@@ -263,13 +267,12 @@ public class UniversalAcMapView extends Application implements Observer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        activeAircrafts.clear();
         aircraftList.clear();
         for (Marker anMarker : markerList.values()) {
             lm.removeMarker(anMarker);
         }
         homeMarker.move(new LatLong(lat, lng));
-        //markerList.clear();                             //clear all markers
+        markerList.clear();                             //clear all markers
         lm.setView(new LatLong(lat, lng), 8);
     }
 
@@ -288,19 +291,20 @@ public class UniversalAcMapView extends Application implements Observer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //update ac in observable list
-        aircraftList.clear();                                //clear observable list
-        aircraftList = db.GetCurrentAircrafts();       //add all from ActiveAircrafts Object
 
         //update acIcons on map
-        table.getSelectionModel().select(selectedIndex);     //keep selected row highlighted
-        Platform.runLater(() -> {                            //updating a JavaFX thread -> runLater()
+        table.getSelectionModel().select(selectedIndex);    //keep selected row highlighted
+        db.deleteOldPlanes();
+        aircraftList.clear();                               //clear observable list
+        aircraftList = db.GetCurrentAircrafts();      //add all from ActiveAircrafts Object
+        Platform.runLater(() -> {                           //updating a JavaFX thread -> runLater()
             try {
+                    table.setItems(aircraftList);
                 for (BasicAircraft ac : aircraftList) {
                     LatLong latlong = new LatLong(ac.getCoordinate().getLatitude(), ac.getCoordinate().getLongitude());
                     String icao = ac.getIcao();
                     String planeIcon = acIconPicker(ac.getTrak());                                 //pass track to picker to get correct icon name
-                    if (markerList.containsKey(icao)) {                                           //ICAO is in hashmap
+                    if (markerList.containsKey(icao)) {                                            //ICAO is in hashmap
                         Marker acMarker = markerList.get(icao);                                    //update marker position and icon
                         acMarker.move(latlong);
                         acMarker.changeIcon(planeIcon);
@@ -313,6 +317,7 @@ public class UniversalAcMapView extends Application implements Observer {
                     }
                 }
             } catch (NullPointerException | ConcurrentModificationException ignore) {
+                System.out.println("Error moving icon");
             }              //if ac doesn't provide required data, don't include it | if other Thread is accessing aircraft List, it can't be used to update icons
         });
     }

@@ -51,7 +51,7 @@ public class Senser extends Observable implements Runnable
 			}
 			if (lab1) System.out.println();
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) { e.printStackTrace(); }
 			
 		}		
