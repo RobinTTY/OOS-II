@@ -2,7 +2,7 @@ package acmapview;
 import java.util.*;
 import messer.*;
 
-public class ActiveAircrafts implements Observer
+public class ActiveAircrafts extends Observable implements Observer, Runnable
 {
 	private final HashMap<String , BasicAircraft> activeAircrafts;		//string = icao
 
@@ -35,6 +35,10 @@ public class ActiveAircrafts implements Observer
 		return activeAircrafts.toString();
 	}
 
+	public boolean contains(String key){
+		return activeAircrafts.containsKey(key);
+	}
+
 
 	@Override
 	//store arg in Hashmap using the method above
@@ -42,5 +46,18 @@ public class ActiveAircrafts implements Observer
     {
 		BasicAircraft ac = (BasicAircraft) arg;
 		this.store(ac.getIcao(), ac);
+	}
+
+	@Override
+	public void run() {
+		while(true) {
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			setChanged();
+			notifyObservers();
+		}
 	}
 }

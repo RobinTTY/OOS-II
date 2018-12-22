@@ -1,6 +1,8 @@
 package senser;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Observable;
 import jsonstream.*;
 
@@ -38,7 +40,8 @@ public class Senser extends Observable implements Runnable
 			//get aircraft list from factory and display plane json
 			jsonAircraftList = factory.fromAircraftJson(aircraftList);
 
-			if (acInRange) System.out.println("Current Aircrafts in range " + jsonAircraftList.size());
+			SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
+			if (acInRange) System.out.println(sdf.format(new Date(System.currentTimeMillis())) + ": Current Aircrafts in range " + jsonAircraftList.size());
 			for(AircraftSentence sentence : jsonAircraftList)
 			{
 				if (lab1) display.display(sentence);
@@ -47,8 +50,8 @@ public class Senser extends Observable implements Runnable
 				notifyObservers(sentence);
 			}
 			if (lab1) System.out.println();
-			if (lab1) try {
-				Thread.sleep(5000);
+			try {
+				Thread.sleep(10000);
 			} catch (InterruptedException e) { e.printStackTrace(); }
 			
 		}		

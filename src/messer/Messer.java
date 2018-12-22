@@ -19,7 +19,7 @@ public class Messer extends Observable implements Observer, Runnable
 	@Override
 	public void update(Observable arg0, Object arg1)
 	{
-		queue.add((AircraftSentence) arg1);		
+		queue.add((AircraftSentence) arg1);
 	}
 
 	public void run()
